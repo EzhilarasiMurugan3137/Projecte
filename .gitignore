@@ -1,0 +1,10 @@
+/target/
+/test-output/
+/test-output-html/
+/Screenshots/
+/ChromeProfile/
+/ChromeData/
+.settings/
+.classpath
+.project
+bin/
