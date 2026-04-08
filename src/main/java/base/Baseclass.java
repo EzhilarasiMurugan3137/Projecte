@@ -4,75 +4,137 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Properties;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.ITestResult;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.*;
 
-import com.aventstack.extentreports.ExtentReports;
-import com.aventstack.extentreports.ExtentTest;
-import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.*;
 
-import utils.ExtentReportNG; // Matches your package and class name
+import utils.ExtentReportNG;
 
 public class Baseclass {
+
     public WebDriver driver;
     public Properties prop;
-    
-    // Extent Report variables
     public static ExtentReports extent;
     public static ExtentTest test;
 
+    // ===========================
+    // REPORT SETUP
+    // ===========================
     @BeforeSuite
     public void setupReport() {
-        // Initialize the report using your static method
         extent = ExtentReportNG.getReportInstance();
     }
 
+    // ===========================
+    // TEST SETUP
+    // ===========================
     @BeforeMethod
     public void setup(java.lang.reflect.Method method) {
-        // 1. Create a test entry in the report using the method name
+
         test = extent.createTest(method.getName());
-        
-        // 2. Load Properties
+
+        // Load properties
         try {
             prop = new Properties();
-            FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + "\\src\\main\\resources\\config.properties");
+            FileInputStream fis = new FileInputStream(
+                    System.getProperty("user.dir") + "/src/main/resources/config.properties");
             prop.load(fis);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // 3. Browser Setup (Windows 11 / Chrome 146)
+        // ===========================
+        // CHROME OPTIONS (FIXED)
+        // ===========================
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--disable-blink-features=AutomationControlled");
-        options.addArguments("user-data-dir=" + System.getProperty("user.dir") + "\\ChromeProfile");
-        
+
+        // ✅ Use separate automation profile (NO conflict)
+        options.addArguments("user-data-dir=C:/AutomationProfile");
+
+        options.addArguments("--start-maximized");
+        options.addArguments("--disable-notifications");
+        options.addArguments("--remote-allow-origins=*");
+
+        // ❌ DO NOT USE:
+        // --incognito
+        // Default Chrome profile
+
         driver = new ChromeDriver(options);
-        driver.manage().window().maximize();
+
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15));
+
+        // ===========================
+        // OPEN APPLICATION
+        // ===========================
         driver.get(prop.getProperty("url"));
-        
-        test.log(Status.INFO, "Browser started and navigated to: " + prop.getProperty("url"));
+
+        // ===========================
+        // HANDLE CLOUDFLARE
+        // ===========================
+        handleCloudflare();
+
+        test.log(Status.INFO, "Browser launched and page loaded");
     }
 
+    // ===========================
+    // CLOUDFLARE HANDLER
+    // ===========================
+    public void handleCloudflare() {
+
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+
+            wait.until(d -> {
+                String title = d.getTitle().toLowerCase();
+                String page = d.getPageSource();
+
+                // ✅ Login page detected
+                if (title.contains("login") || page.contains("Email")) {
+                    return true;
+                }
+
+                // ❌ Cloudflare page detected
+                if (title.contains("just a moment") || page.contains("Verify you are human")) {
+                    try {
+                        Thread.sleep(5000); // wait and retry
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    return false;
+                }
+
+                return false;
+            });
+
+        } catch (Exception e) {
+            System.out.println("⚠ Cloudflare blocking → manually click checkbox once");
+        }
+    }
+
+    // ===========================
+    // TEARDOWN
+    // ===========================
     @AfterMethod
     public void tearDown(ITestResult result) throws IOException {
+
         if (result.getStatus() == ITestResult.FAILURE) {
-            // 1. Capture the screenshot using your TestUtils
-            String screenshotPath = utils.TestUtils.getScreenshot(driver, result.getName());
-            
-            // 2. Log the failure and ATTACH the screenshot to the report
-            test.log(Status.FAIL, "Test Case FAILED: " + result.getName());
+
+            test.log(Status.FAIL, "Test FAILED: " + result.getName());
             test.log(Status.FAIL, "Error: " + result.getThrowable());
-            test.addScreenCaptureFromPath(screenshotPath); // This puts the image in the report!
-            
+
+            if (driver != null) {
+                String screenshotPath = utils.TestUtils.getScreenshot(driver, result.getName());
+                test.addScreenCaptureFromPath(screenshotPath);
+            }
+
         } else if (result.getStatus() == ITestResult.SUCCESS) {
-            test.log(Status.PASS, "Test Case PASSED: " + result.getName());
+            test.log(Status.PASS, "Test PASSED: " + result.getName());
         }
 
         if (driver != null) {
@@ -80,9 +142,11 @@ public class Baseclass {
         }
     }
 
+    // ===========================
+    // REPORT FLUSH
+    // ===========================
     @AfterSuite
     public void generateReport() {
-        // 5. Finalize the report
         if (extent != null) {
             extent.flush();
         }

@@ -13,11 +13,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class CustomersPageObjects {
 	public WebDriver driver;
 
-	// The Parent menu (the one with the 'Users' icon)
 	@FindBy(xpath = "//li[contains(@class,'nav-item')]//p[normalize-space()='Customers']")
 	public WebElement customer;
 
-	// The Child menu (the actual link to the customers list)
 	@FindBy(xpath = "//li[contains(@class,'nav-item')]//ul[contains(@class,'nav-treeview')]//p[normalize-space()='Customers']")
 	public WebElement subCustomer;
 
@@ -39,12 +37,9 @@ public class CustomersPageObjects {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 
-		// 1. Wait for Parent Menu and click it to expand
 		wait.until(ExpectedConditions.elementToBeClickable(customer));
 		customer.click();
 
-		// 2. Wait for the Child Menu to be visible and clickable
-		// Using JS click here is safer for sidebar menus
 		wait.until(ExpectedConditions.elementToBeClickable(subCustomer));
 		js.executeScript("arguments[0].click();", subCustomer);
 	}

@@ -9,10 +9,10 @@ import base.Baseclass;
 import page.LoginpageObjects;
 import page.LogoutPageObjects;
 
-public class LogoutTestCase extends Baseclass {
+public class LogoutTest extends Baseclass {
 
     @Test
-    public void verifyLogout() {
+    public void verifyLogout() throws InterruptedException {
         // Use a single wait object for the entire test
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 

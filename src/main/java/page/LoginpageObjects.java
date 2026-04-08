@@ -27,8 +27,8 @@ public class LoginpageObjects {
 	public WebElement submit;
 
 	public LoginpageObjects(WebDriver driver) {
-		this.driver = driver;
-		PageFactory.initElements(driver, this);
+	    this.driver = driver;
+	    PageFactory.initElements(driver, this);
 	}
 
 	public void enterUserName(String username) {
@@ -44,10 +44,11 @@ public class LoginpageObjects {
 		Passcode.sendKeys(password);
 	}
 
-	public void clickSubmit() {
-	    // Use JS click to avoid triggering 'bot' listeners
-	    org.openqa.selenium.JavascriptExecutor js = (org.openqa.selenium.JavascriptExecutor) driver;
-	    js.executeScript("arguments[0].click();", submit);
+	public void clickSubmit() throws InterruptedException {
+	
+		Thread.sleep(3000);;
+		org.openqa.selenium.JavascriptExecutor js = (org.openqa.selenium.JavascriptExecutor) driver;
+		js.executeScript("arguments[0].click();", submit);
 	}
 
 }

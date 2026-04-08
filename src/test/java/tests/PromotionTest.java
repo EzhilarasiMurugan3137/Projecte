@@ -9,10 +9,10 @@ import base.Baseclass;
 import page.LoginpageObjects;
 import page.PromotionpageObjects;
 
-public class PromotionTestCase extends Baseclass {
+public class PromotionTest extends Baseclass {
 
     @Test
-    public void verifyDiscountsList() {
+    public void verifyDiscountsList() throws InterruptedException {
         // One Wait object to rule them all
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
         

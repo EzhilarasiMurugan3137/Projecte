@@ -30,9 +30,7 @@ public class AddingCustomerpageObjects {
 
     @FindBy(id = "Gender_Male") 
     public WebElement rdMaleGender;
-
-    // REMOVED: txtDob (Date of Birth) as it is not present on your screen
-
+    
     @FindBy(name = "save")
     public WebElement btnSave;
 
@@ -51,7 +49,7 @@ public class AddingCustomerpageObjects {
         js.executeScript("arguments[0].click();", element);
     }
 
-    // Removed 'dob' from the parameters
+    
     public void setCustomerInfo(String email, String password, String firstName, String lastName) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         

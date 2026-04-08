@@ -9,10 +9,10 @@ import base.Baseclass;
 import page.LoginpageObjects;
 import page.SalespageObjects;
 
-public class SalesTestCase extends Baseclass {
+public class SalesTest extends Baseclass {
 
     @Test
-    public void CheckordersList() {
+    public void CheckordersList() throws InterruptedException {
         // Use ONE wait object for the entire test
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
         

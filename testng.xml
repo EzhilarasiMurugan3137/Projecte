@@ -4,13 +4,13 @@
     
     <test thread-count="5" name="Admin Panel Tests">
         <classes>
-            <class name="tests.LoginTestCase"/>
-            <class name="tests.AddingCustomerTestCase"/>
-            <class name="tests.CustomersTestCase"/>
-            <class name="tests.CatalogTestCase"/>
-            <class name="tests.SalesTestCase"/>
-            <class name="tests.PromotionTestCase"/>
-            <class name="tests.LogoutTestCase"/>
+            <class name="tests.LoginTest"/>
+            <class name="tests.AddingCustomerTest"/>
+            <class name="tests.CustomersTest"/>
+            <class name="tests.CatalogTest"/>
+            <class name="tests.SalesTest"/>
+            <class name="tests.PromotionTest"/>
+            <class name="tests.LogoutTest"/>
         </classes>
     </test>
 </suite>
